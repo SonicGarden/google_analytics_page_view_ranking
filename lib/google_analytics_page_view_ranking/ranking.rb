@@ -1,11 +1,12 @@
 require 'active_support/concern'
+require 'google_analytics_page_view_ranking/google_analytics'
 
 module GoogleAnalyticsPageViewRanking
-  module Rannking
+  module Ranking
     extend ActiveSupport::Concern
 
     included do
-      has_many :rankings, class_name: 'PageView', as: :item, dependent: :destroy
+      has_many :rankings, class_name: 'GoogleAnalyticsPageViewRanking::PageView', as: :item, dependent: :destroy
 
       scope :ranking, -> { joins(:rankings).order('page_views.page_view desc') }
       scope :daily_ranking, -> { ranking.where { page_views.period_type == 'daily' } }
@@ -38,17 +39,29 @@ module GoogleAnalyticsPageViewRanking
       end
 
       def refresh_ranking!(period_type, start_date, end_date)
-        item_type = model_name.element.to_sym
-        analytics = GoogleAnalytics.new
-        analytics.ranking(item_type, start_date, end_date).results.each do |value|
-          target_id = value.page_path.slice(/\d+\z/)
-          if target = find_by(id: target_id)
+        analytics = GoogleAnalyticsPageViewRanking::GoogleAnalytics.new
+        analytics.ranking(google_analytics_page_path_regex, start_date, end_date, google_analytics_fetch_limit).results.each do |value|
+          if target = google_analytics_find_item(value)
             page_view = target.rankings.build
             page_view.period_type = period_type
             page_view.page_view = value.pageviews
             page_view.save!
           end
         end
+      end
+
+      def google_analytics_page_path_regex
+        item_type = model_name.element.to_sym
+        "^/#{item_type.to_s.pluralize}/[0-9]+$"
+      end
+
+      def google_analytics_find_item(value)
+        target_id = value.page_path.slice(/\d+\z/)
+        find_by(id: target_id)
+      end
+
+      def google_analytics_fetch_limit
+        30
       end
     end
   end
