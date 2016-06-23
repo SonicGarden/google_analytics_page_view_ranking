@@ -98,6 +98,12 @@ Get Record with ranking order.
 > Article.monthly_ranking
 ````
 
+### Set daily task
+
+````
+GoogleAnalyticsPageViewRanking.refresh_all_rankings
+````
+
 ### Options
 
 基本設定では、 `/articles/10` というURLを前提にAnalyticsからデータを取得する実装になっている。

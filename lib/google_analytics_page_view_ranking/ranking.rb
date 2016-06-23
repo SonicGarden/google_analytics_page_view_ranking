@@ -17,6 +17,8 @@ module GoogleAnalyticsPageViewRanking
 
       scope :top_ranking, -> { limit(15) }
       scope :top_ranking_widget, -> { limit(3) }
+
+      GoogleAnalyticsPageViewRanking.add_target_class(self)
     end
 
     module ClassMethods
