@@ -47,7 +47,9 @@ module GoogleAnalyticsPageViewRanking
             page_view = target.rankings.build
             page_view.period_type = period_type
             page_view.page_view = value.pageviews
-            page_view.save!
+            unless page_view.save
+              GoogleAnalyticsPageViewRanking.log "[GoogleAnalyticsPageViewRanking] failed to save #{self.class_name}: #{value}"
+            end
           end
         end
       end

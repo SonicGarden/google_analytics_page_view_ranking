@@ -17,10 +17,22 @@ module GoogleAnalyticsPageViewRanking
     GoogleAnalyticsPageViewRanking::PageView.transaction do
       GoogleAnalyticsPageViewRanking::PageView.delete_all
       self.target_classes.each do |klass|
+        log "[GoogleAnalyticsPageViewRanking] Start #{klass}"
+        log "[GoogleAnalyticsPageViewRanking] Start #{klass}: daily"
         klass.refresh_daily_ranking!
+        log "[GoogleAnalyticsPageViewRanking] Start #{klass}: weekly"
         klass.refresh_weekly_ranking!
+        log "[GoogleAnalyticsPageViewRanking] Start #{klass}: monthly"
         klass.refresh_monthly_ranking!
       end
+    end
+  end
+
+  def self.log(str)
+    if defined?(Rails)
+      Rails.logger.info str
+    else
+      puts str
     end
   end
 end
