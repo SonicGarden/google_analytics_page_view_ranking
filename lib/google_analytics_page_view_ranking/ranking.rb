@@ -9,9 +9,9 @@ module GoogleAnalyticsPageViewRanking
       has_many :rankings, class_name: 'GoogleAnalyticsPageViewRanking::PageView', as: :item, dependent: :destroy
 
       scope :ranking, -> { joins(:rankings).order('page_views.page_view desc') }
-      scope :daily_ranking, -> { ranking.where { page_views.period_type == 'daily' } }
-      scope :weekly_ranking, -> { ranking.where { page_views.period_type == 'weekly' } }
-      scope :monthly_ranking, -> { ranking.where { page_views.period_type == 'monthly' } }
+      scope :daily_ranking, -> { ranking.where(page_views: {period_type: 'daily'}) }
+      scope :weekly_ranking, -> { ranking.where(page_views: {period_type: 'weekly'}) }
+      scope :monthly_ranking, -> { ranking.where(page_views: {period_type: 'monthly'}) }
 
       scope :ranking_list, -> { order(page_views: :desc) }
 
